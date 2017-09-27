@@ -10,6 +10,10 @@ APlayerShip::APlayerShip()
  	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
+	CameraBoom->SetupAttachment(RootComponent);
+	CameraBoom->TargetArmLength = 300.0f;
+
 }
 
 // Called when the game starts or when spawned
@@ -34,6 +38,9 @@ void APlayerShip::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	PlayerInputComponent->BindTouch(IE_Pressed, this, &APlayerShip::TouchStarted);
 	PlayerInputComponent->BindTouch(IE_Pressed, this, &APlayerShip::TouchStopped);
 	PlayerInputComponent->BindVectorAxis("Acceleration", this, &APlayerShip::Acceleration);
+	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &APlayerShip::Fire);
+	PlayerInputComponent->BindAction("Tilt_Left", IE_Pressed, this, &APlayerShip::MoveLeft);
+	PlayerInputComponent->BindAction("Tilt_Right", IE_Pressed, this, &APlayerShip::MoveRight);
 }
 
 void APlayerShip::TouchStarted(ETouchIndex::Type FingerIndex, FVector Location)
@@ -52,5 +59,20 @@ void APlayerShip::TouchStopped(ETouchIndex::Type FingerIndex, FVector Location)
 void APlayerShip::Acceleration(FVector Acceleration)
 {
 	UE_LOG(LogTemp, Warning, TEXT("Acceleration input: %s"), *Acceleration.ToString());
+}
+
+void APlayerShip::Fire()
+{
+	UE_LOG(LogTemp, Warning, TEXT("Fire!"));
+}
+
+void APlayerShip::MoveLeft() 
+{
+	UE_LOG(LogTemp, Warning, TEXT("Left"));
+}
+
+void APlayerShip::MoveRight()
+{
+	UE_LOG(LogTemp, Warning, TEXT("Right"));
 }
 

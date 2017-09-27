@@ -14,6 +14,11 @@ public:
 	// Sets default values for this pawn's properties
 	APlayerShip();
 
+private:
+	// CameraBoom for controlling the player camera
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+	class USpringArmComponent *CameraBoom;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -34,6 +39,13 @@ protected:
 
 	// Handles Accelerometer data
 	void Acceleration(FVector Acceleration);
+
+	// Temp function to test firing
+	void Fire();
+
+	// Temp function to test tilting to the left
+	void MoveLeft();
 	
-	
+	// Temp function to test tilting to the left
+	void MoveRight();
 };
