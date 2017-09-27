@@ -10,3 +10,4 @@ Saved
 *.suo
 *.xcodeproj
 *.xcworkspace
+/ipch/VERTICAL_FLIGHT-a7b7f285/*.ipch

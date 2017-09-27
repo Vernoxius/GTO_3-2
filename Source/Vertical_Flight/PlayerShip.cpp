@@ -1,8 +1,11 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Vertical_Flight.h"
+#include "PaperSpriteComponent.h"
 #include "PlayerShip.h"
+#include "Bullet.h"
 
+const FName APlayerShip::GunMuzzle(TEXT("Muzzle"));
 
 // Sets default values
 APlayerShip::APlayerShip()
@@ -10,9 +13,14 @@ APlayerShip::APlayerShip()
  	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	SpriteComponent = CreateDefaultSubobject<UPaperSpriteComponent>(TEXT("ShipSprite"));
+	RootComponent = SpriteComponent;
+
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	CameraBoom->SetupAttachment(RootComponent);
 	CameraBoom->TargetArmLength = 300.0f;
+
+	FireCooldown = 1.0f;
 
 }
 
@@ -35,9 +43,9 @@ void APlayerShip::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 		
-	PlayerInputComponent->BindTouch(IE_Pressed, this, &APlayerShip::TouchStarted);
-	PlayerInputComponent->BindTouch(IE_Pressed, this, &APlayerShip::TouchStopped);
-	PlayerInputComponent->BindVectorAxis("Acceleration", this, &APlayerShip::Acceleration);
+	//PlayerInputComponent->BindTouch(IE_Pressed, this, &APlayerShip::TouchStarted);
+	//PlayerInputComponent->BindTouch(IE_Pressed, this, &APlayerShip::TouchStopped);
+	//PlayerInputComponent->BindVectorAxis("Acceleration", this, &APlayerShip::Acceleration);
 	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &APlayerShip::Fire);
 	PlayerInputComponent->BindAction("Tilt_Left", IE_Pressed, this, &APlayerShip::MoveLeft);
 	PlayerInputComponent->BindAction("Tilt_Right", IE_Pressed, this, &APlayerShip::MoveRight);
@@ -63,7 +71,20 @@ void APlayerShip::Acceleration(FVector Acceleration)
 
 void APlayerShip::Fire()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Fire!"));
+	if (UWorld* World = GetWorld())
+	{
+		float CurrentTime = World->GetTimeSeconds();
+		if (FireReadyTime <= CurrentTime)
+		{
+			FVector Loc = SpriteComponent->GetSocketLocation(GunMuzzle);
+			if (AActor* NewBullet = World->SpawnActor(Bullet))
+			{
+				NewBullet->SetActorLocation(Loc);
+			}
+
+		}
+		FireReadyTime = CurrentTime + FireCooldown;
+	}
 }
 
 void APlayerShip::MoveLeft() 

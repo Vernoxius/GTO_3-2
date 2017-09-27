@@ -5,6 +5,8 @@
 #include "GameFramework/Pawn.h"
 #include "PlayerShip.generated.h"
 
+class ABullet;
+
 UCLASS()
 class VERTICAL_FLIGHT_API APlayerShip : public APawn
 {
@@ -30,6 +32,9 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	// name of the gun muzzle for spawning bullets
+	static const FName GunMuzzle;
+
 protected:
 	// Handler for when a touch starts
 	void TouchStarted(ETouchIndex::Type FingerIndex, FVector Location);
@@ -48,4 +53,21 @@ protected:
 	
 	// Temp function to test tilting to the left
 	void MoveRight();
+
+	// Bullet to spawn when firing
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Ship")
+	TSubclassOf<AActor> Bullet;
+
+private:
+	// Sprite for the ship
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Ship", meta = (AllowPrivateAccess = "true"))
+	class UPaperSpriteComponent* SpriteComponent;
+
+	// Cooldown timer for firing
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Ship", meta = (AllowPrivateAccess = "true"))
+	float FireCooldown;
+
+	// Timer to keep track of fire cooldown
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Ship", meta = (AllowPrivateAccess = "true"))
+	float FireReadyTime;
 };
