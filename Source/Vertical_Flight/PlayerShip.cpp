@@ -10,25 +10,28 @@ const FName APlayerShip::GunMuzzle(TEXT("Muzzle"));
 // Sets default values
 APlayerShip::APlayerShip()
 {
- 	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 	SpriteComponent = CreateDefaultSubobject<UPaperSpriteComponent>(TEXT("ShipSprite"));
 	RootComponent = SpriteComponent;
 
-	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
-	CameraBoom->SetupAttachment(RootComponent);
-	CameraBoom->TargetArmLength = 300.0f;
+	CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComponent"));
+	CameraComponent->bUsePawnControlRotation = false;
+	CameraComponent->bAbsoluteLocation = true;
 
-	FireCooldown = 1.0f;
+	FireCooldown = 0.1f;
 
+	bCanFire = false;
+	bMoveLeft = false;
+	bMoveRight = false;
 }
 
 // Called when the game starts or when spawned
 void APlayerShip::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
 }
 
 // Called every frame
@@ -36,64 +39,88 @@ void APlayerShip::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if (bCanFire)
+	{
+		if (UWorld* World = GetWorld())
+		{
+			float CurrentTime = World->GetTimeSeconds();
+			if (FireReadyTime <= CurrentTime)
+			{
+				FVector Loc = SpriteComponent->GetSocketLocation(GunMuzzle);
+				if (AActor* NewBullet = World->SpawnActor(Bullet))
+				{
+					NewBullet->SetActorLocation(Loc);
+				}
+				FireReadyTime = CurrentTime + FireCooldown;
+			}
+		}
+	}
+
+	if (bMoveLeft)
+	{
+		FVector Loc = GetActorLocation();
+		if (Loc.Y > -490.0f)
+		{
+			Loc += FVector(0.0f, -5.0f, 0.0f);
+			SetActorLocation(Loc);
+		}
+	}
+
+	if (bMoveRight)
+	{
+		FVector Loc = GetActorLocation();
+		if (Loc.Y < 490)
+		{
+			Loc += FVector(0.0f, 5.0f, 0.0f);
+			SetActorLocation(Loc);
+		}
+	}
+
 }
 
 // Called to bind functionality to input
 void APlayerShip::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
-		
-	//PlayerInputComponent->BindTouch(IE_Pressed, this, &APlayerShip::TouchStarted);
-	//PlayerInputComponent->BindTouch(IE_Pressed, this, &APlayerShip::TouchStopped);
-	//PlayerInputComponent->BindVectorAxis("Acceleration", this, &APlayerShip::Acceleration);
-	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &APlayerShip::Fire);
-	PlayerInputComponent->BindAction("Tilt_Left", IE_Pressed, this, &APlayerShip::MoveLeft);
-	PlayerInputComponent->BindAction("Tilt_Right", IE_Pressed, this, &APlayerShip::MoveRight);
+
+	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &APlayerShip::FirePressed);
+	PlayerInputComponent->BindAction("Fire", IE_Released, this, &APlayerShip::FireReleased);
+
+	PlayerInputComponent->BindAction("Left", IE_Pressed, this, &APlayerShip::LeftPressed);
+	PlayerInputComponent->BindAction("Left", IE_Released, this, &APlayerShip::LeftReleased);
+
+	PlayerInputComponent->BindAction("Right", IE_Pressed, this, &APlayerShip::RightPressed);
+	PlayerInputComponent->BindAction("Right", IE_Released, this, &APlayerShip::RightReleased);
+
 }
 
-void APlayerShip::TouchStarted(ETouchIndex::Type FingerIndex, FVector Location)
+void APlayerShip::FirePressed()
 {
-	//if right side of screen : fire
-	//if left side of the screen : save coordinate to check for swipe
-	UE_LOG(LogTemp, Warning, TEXT("Touched"));
+	bCanFire = true;
 }
 
-void APlayerShip::TouchStopped(ETouchIndex::Type FingerIndex, FVector Location)
+void APlayerShip::FireReleased()
 {
-	// if right side of the screen : stop firing
-	//if left side of the screen : check for swipe
+	bCanFire = false;
 }
 
-void APlayerShip::Acceleration(FVector Acceleration)
+void APlayerShip::LeftPressed()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Acceleration input: %s"), *Acceleration.ToString());
+	bMoveLeft = true;
 }
 
-void APlayerShip::Fire()
+void APlayerShip::LeftReleased()
 {
-	if (UWorld* World = GetWorld())
-	{
-		float CurrentTime = World->GetTimeSeconds();
-		if (FireReadyTime <= CurrentTime)
-		{
-			FVector Loc = SpriteComponent->GetSocketLocation(GunMuzzle);
-			if (AActor* NewBullet = World->SpawnActor(Bullet))
-			{
-				NewBullet->SetActorLocation(Loc);
-			}
-
-		}
-		FireReadyTime = CurrentTime + FireCooldown;
-	}
+	bMoveLeft = false;
 }
 
-void APlayerShip::MoveLeft() 
+
+void APlayerShip::RightPressed()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Left"));
+	bMoveRight = true;
 }
 
-void APlayerShip::MoveRight()
+void APlayerShip::RightReleased()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Right"));
+	bMoveRight = false;
 }
-

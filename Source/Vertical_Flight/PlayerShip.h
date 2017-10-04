@@ -18,8 +18,12 @@ public:
 
 private:
 	// CameraBoom for controlling the player camera
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", meta = (AllowPrivateAccess = "true"))
 	class USpringArmComponent *CameraBoom;
+
+	// CameraComponent
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", meta = (AllowPrivateAccess = "true"))
+	class UCameraComponent* CameraComponent;
 
 protected:
 	// Called when the game starts or when spawned
@@ -45,14 +49,32 @@ protected:
 	// Handles Accelerometer data
 	void Acceleration(FVector Acceleration);
 
-	// Temp function to test firing
-	void Fire();
+	// function start firing
+	void FirePressed();
 
-	// Temp function to test tilting to the left
-	void MoveLeft();
+	// function stop firing
+	void FireReleased();
+
+	// function to start moving to the left
+	void LeftPressed();
+
+	// function to stop moving to the left
+	void LeftReleased();
 	
-	// Temp function to test tilting to the left
-	void MoveRight();
+	// function to start moving to the right
+	void RightPressed();
+
+	// function to stop moving to the right
+	void RightReleased();
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Ship")
+	uint32 bCanFire : 1;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Ship")
+	uint32 bMoveLeft : 1;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Ship")
+	uint32 bMoveRight : 1;
 
 	// Bullet to spawn when firing
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Ship")

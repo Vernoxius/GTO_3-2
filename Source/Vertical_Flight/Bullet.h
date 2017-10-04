@@ -18,15 +18,21 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-//	UFUNCTION(BlueprintNativeEvent, Category = "Bullet")
-//	void Explode();
-//	virtual void Explode_Implementation();
-
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Bullet")
+	USphereComponent* CollisionComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Bullet")
+	UProjectileMovementComponent* ProjectileMovement;
+
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Bullet")
 	float Speed;
+
+	UFUNCTION()
+	void OnHit(class UPrimitiveComponent* HitComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 	
 };
