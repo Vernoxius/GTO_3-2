@@ -75,7 +75,6 @@ void APlayerShip::Tick(float DeltaTime)
 			SetActorLocation(Loc);
 		}
 	}
-
 }
 
 // Called to bind functionality to input
@@ -83,6 +82,11 @@ void APlayerShip::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
+	//Setup for thouch devices
+	PlayerInputComponent->BindTouch(IE_Pressed, this, &APlayerShip::TouchStarted);
+	PlayerInputComponent->BindTouch(IE_Released, this, &APlayerShip::TouchStopped);
+
+	//Setup for pc
 	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &APlayerShip::FirePressed);
 	PlayerInputComponent->BindAction("Fire", IE_Released, this, &APlayerShip::FireReleased);
 
@@ -123,4 +127,20 @@ void APlayerShip::RightPressed()
 void APlayerShip::RightReleased()
 {
 	bMoveRight = false;
+}
+
+void APlayerShip::TouchStarted(ETouchIndex::Type FingerIndex, FVector Location)
+{
+	if (Location.X >= 600.0f)
+	{
+		bCanFire = true;
+	}
+}
+
+void APlayerShip::TouchStopped(ETouchIndex::Type FiongerIndex, FVector Location)
+{
+	if (Location.X >= 600.0f)
+	{
+		bCanFire = false;
+	}
 }

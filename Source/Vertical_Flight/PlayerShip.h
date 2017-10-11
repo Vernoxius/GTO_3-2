@@ -29,7 +29,7 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-public:	
+public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
@@ -39,11 +39,17 @@ public:
 	// name of the gun muzzle for spawning bullets
 	static const FName GunMuzzle;
 
+	bool Test;
+	FVector Tilt;
+	FVector RotationRate;
+	FVector Gravity;
+	FVector Aceleration;
+
 protected:
-	// Handler for when a touch starts
+	// Handler for when a touch input begins
 	void TouchStarted(ETouchIndex::Type FingerIndex, FVector Location);
 
-	// Handler for when a touch stops
+	// Handler for when a touch input stops
 	void TouchStopped(ETouchIndex::Type FingerIndex, FVector Location);
 
 	// Handles Accelerometer data
@@ -60,7 +66,7 @@ protected:
 
 	// function to stop moving to the left
 	void LeftReleased();
-	
+
 	// function to start moving to the right
 	void RightPressed();
 
@@ -68,17 +74,17 @@ protected:
 	void RightReleased();
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Ship")
-	uint32 bCanFire : 1;
+		uint32 bCanFire : 1;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Ship")
-	uint32 bMoveLeft : 1;
+		uint32 bMoveLeft : 1;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Ship")
-	uint32 bMoveRight : 1;
+		uint32 bMoveRight : 1;
 
 	// Bullet to spawn when firing
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Ship")
-	TSubclassOf<AActor> Bullet;
+		TSubclassOf<AActor> Bullet;
 
 private:
 	// Sprite for the ship
@@ -87,9 +93,9 @@ private:
 
 	// Cooldown timer for firing
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Ship", meta = (AllowPrivateAccess = "true"))
-	float FireCooldown;
+		float FireCooldown;
 
 	// Timer to keep track of fire cooldown
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Ship", meta = (AllowPrivateAccess = "true"))
-	float FireReadyTime;
+		float FireReadyTime;
 };
